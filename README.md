@@ -1,7 +1,15 @@
-# Tauri + React + Typescript
+# TauriDex
 
-This template should help get you started developing with Tauri, React and Typescript in Vite.
+This is a small Tauri + React + TypeScript PokéDex like Application. The main focus of this project is to provide a fast way to look up a specific Pokémons stats, weaknesses and evolutions.
 
-## Recommended IDE Setup
+Another key feature is the ability to type the names of the Pokémon in both English and German.
 
-- [VS Code](https://code.visualstudio.com/) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
+## TODO:
+
+[x] - caching
+[x] - weakness calculation for dualtypes
+[x] - weakness calculation for abilities
+[] - wonderguard implementation
+[] - evolutions
+[] - next/prev button
+[] - showing abilities
