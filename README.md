@@ -13,4 +13,3 @@ Another key feature is the ability to type the names of the Pokémon in both Eng
 - [x] next/prev button
 - [x] showing abilities
 - [ ] evolutions (needs polishing)
-- [ ]
