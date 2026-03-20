@@ -27,4 +27,5 @@ tauri-plugin-shell = "2"
 specta = { version = "=2.0.0-rc.22", features = ["derive"] }
 tauri-specta = {version = "=2.0.0-rc.21", features = ["typescript"] }# Removed "typescript" and "javascript" features
 specta-typescript = "=0.0.9" # Added the new TypeScript exporter
+tokio = { version = "1.50.0", features = ["macros"] }
 

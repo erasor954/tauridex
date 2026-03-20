@@ -10,7 +10,7 @@ export function PokemonImage({ pokemon }: PokemonImageProp) {
   return (
     <div className="relative p-6 bg-slate-800 rounded-xl border border-slate-700 flex flex-col items-center">
       <h2 className="absolute top-4 left-4 text-slate-500 font-mono font-bold">
-        {pokemon.id}
+        #{pokemon.id}
       </h2>
       <h2 className="text-2xl font-bold capitalize mb-4">{pokemon.name}</h2>
 

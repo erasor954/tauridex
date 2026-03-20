@@ -24,3 +24,12 @@ export const getPokewikiUrl = (
 
   return `https://www.pokewiki.de/${name}`;
 };
+
+export const nameToIdIndex: Record<string, number | string> = {
+  ...Object.fromEntries(
+    Object.entries(englishToId).map(([k, v]) => [k.toLowerCase(), v]),
+  ),
+  ...Object.fromEntries(
+    Object.entries(germanToId).map(([k, v]) => [k.toLowerCase(), v]),
+  ),
+};

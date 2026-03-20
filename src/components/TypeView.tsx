@@ -54,73 +54,8 @@ export function TypeView({ types, abilities = [] }: TypeViewProps) {
     { label: "4x", value: 4, color: "text-red-500 font-bold" },
   ];
 
-  // const quad_weaknesses = profile
-  //   .filter((p) => p.multiplier > 2)
-  //   .sort((a, b) => b.multiplier - a.multiplier);
-
-  // const weaknesses = profile
-  //   .filter((p) => p.multiplier > 1 && p.multiplier < 2)
-  //   .sort((a, b) => b.multiplier - a.multiplier);
-
-  // const resistances = profile
-  //   .filter((p) => p.multiplier < 1 && p.multiplier > 0.25)
-  //   .sort((a, b) => a.multiplier - b.multiplier);
-
-  // const quad_resistances = profile
-  //   .filter((p) => p.multiplier < 0.5 && p.multiplier > 0)
-  //   .sort((a, b) => a.multiplier - b.multiplier);
-
-  // const immunities = profile.filter((p) => p.multiplier === 0);
-
-  // A small helper to keep our JSX DRY (Don't Repeat Yourself)
-  // const renderSection = (
-  //   title: string,
-  //   data: { type: PokemonType; multiplier: number }[],
-  // ) => {
-  //   if (data.length === 0) return null;
-
-  //   return (
-  //     <div className="mb-4">
-  //       <h4 className="text-sm font-semibold text-slate-400 mb-2 uppercase tracking-wider">
-  //         {title}
-  //       </h4>
-  //       <div className="flex flex-wrap gap-2">
-  //         {data.map(({ type }) => (
-  //           <TypeBadge type={type} />
-  //           // We wrap your TypeBadge in a small pill to display the multiplier number next to it
-  //           // <div
-  //           //   key={type}
-  //           //   className="flex items-center bg-slate-900 rounded-full pr-3 border border-slate-700 shadow-sm"
-  //           // >
-  //           //   <TypeBadge type={type} />
-  //           //   <span
-  //           //     className={`text-xs font-bold ml-2 ${multiplier > 1 ? "text-red-400" : "text-emerald-400"}`}
-  //           //   >
-  //           //     {multiplier}x
-  //           //   </span>
-  //           // </div>
-  //         ))}
-  //       </div>
-  //     </div>
-  //   );
-  // };
-
-  // return (
-  //   <div className="mt-6">
-  //     <h3 className="text-xl font-bold mb-4 border-b border-slate-700 pb-2">
-  //       Defense Profile
-  //     </h3>
-  //     <div className="space-y-2">
-  //       {renderSection("Quad Weak To", quad_weaknesses)}
-  //       {renderSection("Weak To", weaknesses)}
-  //       {renderSection("Resistant To", resistances)}
-  //       {renderSection("Quad Resistant To", quad_resistances)}
-  //       {renderSection("Immune To", immunities)}
-  //     </div>
-  //   </div>
-  // );
   return (
-    <div className="mt-6">
+    <div>
       <h3 className="text-xl font-bold mb-4 border-b border-slate-700 pb-2">
         Defense Profile
       </h3>

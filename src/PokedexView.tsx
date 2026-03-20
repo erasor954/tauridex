@@ -1,9 +1,6 @@
 import { useState, useEffect } from "react";
-// import { invoke } from "@tauri-apps/api/core";
 import { commands, type PokemonSummary } from "./bindings";
 
-import germanMap from "./data/pokemon_names_de.json";
-import englishMap from "./data/pokemon_names_en.json";
 import { PokemonType } from "./types/pokemon";
 import { StatView } from "./components/StatView";
 import { TypeView } from "./components/TypeView";
@@ -11,17 +8,10 @@ import { ChevronLeft, ChevronRight, Search } from "lucide-react";
 import { AbilityView } from "./components/AbilityView";
 import { ExternalLink } from "./components/ExternalLink";
 import { PokemonImage } from "./components/PokemonImage";
+import { EvolutionTree } from "./components/EvolutionTree";
+import { nameToIdIndex } from "./utils/pokemonUtils";
 
 const HIGHEST_POKEDEX_ID: number = 1025 as const;
-
-const nameToIdIndex: Record<string, number | string> = {
-  ...Object.fromEntries(
-    Object.entries(englishMap).map(([k, v]) => [k.toLowerCase(), v]),
-  ),
-  ...Object.fromEntries(
-    Object.entries(germanMap).map(([k, v]) => [k.toLowerCase(), v]),
-  ),
-};
 
 const allPokemonNames = Object.keys(nameToIdIndex);
 
@@ -91,15 +81,12 @@ export function PokedexView() {
     try {
       const resolvedId = nameToIdIndex[query] || query;
 
-      // 1. Fetch the Specta Result object
       const result = await commands.getPokemon(resolvedId.toString());
 
-      // 2. Check the status property to unwrap it, just like a Rust match statement!
       if (result.status === "ok") {
         setPokemonData(result.data); // result.data is now guaranteed to be PokemonSummary
         setSearchInput(manualInput || searchInput);
       } else {
-        // result.error is guaranteed to be your Rust String error
         console.error("Search error:", result.error);
         setError("Pokémon not found. Try another name or ID.");
       }
@@ -233,6 +220,14 @@ export function PokedexView() {
                 abilities={pokemonData.abilities.map((a) => a.ability.name)}
               />
             </div>
+
+            {pokemonData.evolution_chain &&
+              pokemonData.evolution_chain.evolves_to &&
+              pokemonData.evolution_chain.evolves_to.length > 0 && (
+                <div className="p-6 bg-slate-800 rounded-xl border border-slate-700 md:col-span-2">
+                  <EvolutionTree node={pokemonData.evolution_chain} />
+                </div>
+              )}
           </div>
         )}
       </div>

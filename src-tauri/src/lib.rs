@@ -1,7 +1,7 @@
 mod models;
-use models::PokemonSummary;
+use models::{PokemonSummary, SpeciesResponse, EvolutionChainResponse};
 use std::fs;
-use tauri::{AppHandle, Manager, Wry}; // <-- Added `Wry`
+use tauri::{AppHandle, Manager, Wry};
 
 #[tauri::command]
 #[specta::specta]
@@ -19,12 +19,36 @@ async fn get_pokemon(app: AppHandle, id: String) -> Result<PokemonSummary, Strin
         return Ok(json);
     }
 
-    let url = format!("https://pokeapi.co/api/v2/pokemon/{}", id);
-    let response = reqwest::get(url).await.map_err(|e| e.to_string())?;
-    let pokemon_data = response
+    let pokemon_url = format!("https://pokeapi.co/api/v2/pokemon/{}", id);
+    let species_url = format!("https://pokeapi.co/api/v2/pokemon-species/{}", id);
+    
+    let (pokemon_res, species_res) = tokio::join!(
+        reqwest::get(&pokemon_url),
+        reqwest::get(&species_url)
+    );
+
+    let pokemon_res = pokemon_res.map_err(|e| e.to_string())?;
+    let species_res = species_res.map_err(|e| e.to_string())?;
+
+    let mut pokemon_data = pokemon_res
         .json::<PokemonSummary>()
         .await
         .map_err(|e| e.to_string())?;
+
+    let species_data = species_res
+        .json::<SpeciesResponse>()
+        .await
+        .map_err(|e| e.to_string())?;
+
+
+    let evo_url = species_data.evolution_chain.url;
+    let evo_res = reqwest::get(&evo_url).await.map_err(|e| e.to_string())?;
+    let evo_data = evo_res
+        .json::<EvolutionChainResponse>()
+        .await
+        .map_err(|e| e.to_string())?;
+
+    pokemon_data.evolution_chain = Some(evo_data.chain);
 
     let json_string = serde_json::to_string(&pokemon_data).map_err(|e| e.to_string())?;
     fs::write(file_path, json_string).map_err(|e| e.to_string())?;
@@ -34,13 +58,11 @@ async fn get_pokemon(app: AppHandle, id: String) -> Result<PokemonSummary, Strin
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    // 1. Setup the Specta Builder using the new syntax
     let builder = tauri_specta::Builder::<Wry>::new()
         .commands(tauri_specta::collect_commands![
             get_pokemon
         ]);
 
-    // 2. Export the bindings (only during development)
     #[cfg(debug_assertions)]
     builder
         .export(
@@ -52,7 +74,6 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_opener::init())
-        // 3. Use the builder's handler to register everything at once
         .invoke_handler(builder.invoke_handler())
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
