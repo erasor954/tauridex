@@ -9,7 +9,7 @@ Another key feature is the ability to type the names of the Pokémon in both Eng
 - [x] caching
 - [x] weakness calculation for dualtypes
 - [x] weakness calculation for abilities
-- [x] wonderguard implementation
 - [x] next/prev button
 - [x] showing abilities
+- [ ] wonderguard implementation
 - [ ] evolutions (needs polishing)
