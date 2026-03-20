@@ -1,13 +1,18 @@
 import { useState, useEffect } from "react";
-import { invoke } from "@tauri-apps/api/core";
-import { open } from "@tauri-apps/plugin-shell";
+// import { invoke } from "@tauri-apps/api/core";
+import { commands, type PokemonSummary } from "./bindings";
 
-import germanMap from "./assets/pokemon_names_de.json";
-import englishMap from "./assets/pokemon_names_en.json";
-import { Pokemon, PokemonType } from "./types/pokemon";
+import germanMap from "./data/pokemon_names_de.json";
+import englishMap from "./data/pokemon_names_en.json";
+import { PokemonType } from "./types/pokemon";
 import { StatView } from "./components/StatView";
-import { TypeBadge } from "./components/TypeBadge";
 import { TypeView } from "./components/TypeView";
+import { ChevronLeft, ChevronRight, Search } from "lucide-react";
+import { AbilityView } from "./components/AbilityView";
+import { ExternalLink } from "./components/ExternalLink";
+import { PokemonImage } from "./components/PokemonImage";
+
+const HIGHEST_POKEDEX_ID: number = 1025 as const;
 
 const nameToIdIndex: Record<string, number | string> = {
   ...Object.fromEntries(
@@ -27,7 +32,7 @@ export function PokedexView() {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [pokemonData, setPokemonData] = useState<Pokemon | null>(null);
+  const [pokemonData, setPokemonData] = useState<PokemonSummary | null>(null);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -72,7 +77,7 @@ export function PokedexView() {
     }
   };
 
-  const handleSearch = async (e?: React.FormEvent, manualInput?: string) => {
+  const handleSearch = async (e?: React.SubmitEvent, manualInput?: string) => {
     if (e) e.preventDefault();
 
     const query = (manualInput || searchInput).trim().toLowerCase();
@@ -86,12 +91,18 @@ export function PokedexView() {
     try {
       const resolvedId = nameToIdIndex[query] || query;
 
-      const data = await invoke<Pokemon>("get_pokemon", {
-        id: resolvedId.toString(),
-      });
+      // 1. Fetch the Specta Result object
+      const result = await commands.getPokemon(resolvedId.toString());
 
-      setPokemonData(data);
-      setSearchInput(manualInput || searchInput);
+      // 2. Check the status property to unwrap it, just like a Rust match statement!
+      if (result.status === "ok") {
+        setPokemonData(result.data); // result.data is now guaranteed to be PokemonSummary
+        setSearchInput(manualInput || searchInput);
+      } else {
+        // result.error is guaranteed to be your Rust String error
+        console.error("Search error:", result.error);
+        setError("Pokémon not found. Try another name or ID.");
+      }
     } catch (err) {
       console.error("Search error:", err);
       setError("Pokémon not found. Try another name or ID.");
@@ -101,36 +112,61 @@ export function PokedexView() {
   };
 
   useEffect(() => {
-    handleSearch(undefined, "sudowoodo");
+    handleSearch(undefined, "Mogelbaum");
   }, []);
-
-  const wikiUrl = pokemonData
-    ? `https://www.pokewiki.de/${pokemonData.name}`
-    : "";
 
   return (
     <div className="min-h-screen bg-slate-900 text-white p-8">
-      <div className="max-w-md mx-auto mb-8 relative">
-        <form onSubmit={handleSearch} className="max-w-md mx-auto mb-8">
-          <div className="flex gap-2">
-            <input
-              type="text"
-              value={searchInput}
-              onChange={handleInputChange}
-              onKeyDown={handleKeyDown}
-              onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
-              onFocus={() => {
-                if (suggestions.length > 0) setShowSuggestions(true);
-              }}
-              placeholder="Search by name or ID"
-              className="w-full p-3 rounded-lg bg-slate-800 border border-slate-700 focus:border-cyan-400 focus:outline-none transition-colors"
-            />
-            <button
-              type="submit"
-              className="px-6 py-3 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-bold transition-colors"
-            >
-              Search
-            </button>
+      <div className="max-w-lg mx-auto mb-8 relative">
+        <form onSubmit={handleSearch} className="w-full mx-auto mb-8">
+          <div className="flex gap-3 items-stretch justify-center">
+            <div className="flex-none aspect-square">
+              {pokemonData && pokemonData.id > 1 && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleSearch(undefined, (pokemonData.id - 1).toString());
+                  }}
+                  className="p-3 rounded-lg bg-slate-800 border border-slate-700 hover:bg-slate-700 text-cyan-400 transition-colors"
+                >
+                  <ChevronLeft size={24} />
+                </button>
+              )}
+            </div>
+            <div className="flex-1 flex gap-2 min-w-0">
+              <input
+                id="doesntmatter"
+                type="text"
+                value={searchInput}
+                onChange={handleInputChange}
+                onKeyDown={handleKeyDown}
+                onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
+                onFocus={() => {
+                  if (suggestions.length > 0) setShowSuggestions(true);
+                }}
+                placeholder="Search by name or ID"
+                className="w-full p-3 rounded-lg bg-slate-800 border border-slate-700 focus:border-cyan-400 focus:outline-none transition-colors"
+              />
+              <button
+                type="submit"
+                className="px-6 py-3 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-bold transition-colors"
+              >
+                <Search size={24} />
+              </button>
+            </div>
+            <div className="flex-none aspect-square">
+              {pokemonData && pokemonData.id < HIGHEST_POKEDEX_ID && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleSearch(undefined, (pokemonData.id + 1).toString());
+                  }}
+                  className="p-3 rounded-lg bg-slate-800 border border-slate-700 hover:bg-slate-700 text-cyan-400 transition-colors"
+                >
+                  <ChevronRight size={24} />
+                </button>
+              )}
+            </div>
           </div>
         </form>
         {showSuggestions && suggestions.length > 0 && (
@@ -179,40 +215,16 @@ export function PokedexView() {
 
         {pokemonData && !isLoading && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="p-6 bg-slate-800 rounded-xl border border-slate-700 flex flex-col items-center">
-              <h2 className="text-2xl font-bold capitalize mb-4">
-                {pokemonData.name}
-              </h2>
-
-              <img
-                src={
-                  pokemonData.sprites.other["official-artwork"].front_default
-                }
-                alt={pokemonData.name}
-                className="w-full max-w-xs h-auto drop-shadow-2xl mb-4"
-              />
-              <div className="flex gap-2">
-                {pokemonData.types.map((t) => (
-                  <TypeBadge
-                    key={t.type.name}
-                    type={t.type.name as PokemonType}
-                  />
-                ))}
-              </div>
-            </div>
+            <PokemonImage pokemon={pokemonData} />
 
             <div className="p-6 bg-slate-800 rounded-xl border border-slate-700">
               <StatView stats={pokemonData.stats} />
-              <a
-                href={wikiUrl}
-                onClick={async (e) => {
-                  e.preventDefault();
-                  await open(wikiUrl);
-                }}
-                className="text-sm text-cyan-400 hover:text-cyan-300 transition-colors mt-1"
-              >
-                View on PokéWiki ↗
-              </a>
+              <AbilityView abilities={pokemonData.abilities} />
+              <ExternalLink
+                name={pokemonData.name}
+                type="pokemon"
+                text="View on PokéWiki ↗"
+              />
             </div>
 
             <div className="p-6 bg-slate-800 rounded-xl border border-slate-700 md:col-span-2">

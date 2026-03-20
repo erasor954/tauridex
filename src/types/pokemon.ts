@@ -39,17 +39,17 @@ export const ALL_TYPES: PokemonType[] = [
   "fairy",
 ] as const;
 
-export interface Pokemon {
-  id: number;
-  name: string;
-  sprites: {
-    other: {
-      "official-artwork": {
-        front_default: string;
-      };
-    };
-  };
-  abilities: Array<{ ability: { name: string }; is_hidden: boolean }>;
-  types: Array<{ type: { name: PokemonType } }>;
-  stats: Array<{ base_stat: number; stat: { name: string } }>;
-}
+// export interface Pokemon {
+//   id: number;
+//   name: string;
+//   sprites: {
+//     other: {
+//       "official-artwork": {
+//         front_default: string;
+//       };
+//     };
+//   };
+//   abilities: Array<{ ability: { name: string }; is_hidden: boolean }>;
+//   types: Array<{ type: { name: PokemonType } }>;
+//   stats: Array<{ base_stat: number; stat: { name: string } }>;
+// }
