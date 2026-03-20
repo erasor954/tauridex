@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "tauridex",
+  "productName": "TauriDex",
   "version": "1.0.0",
   "identifier": "com.erasor.tauridex",
   "build": {
