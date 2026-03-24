@@ -16,7 +16,7 @@ export function EvolutionTree({ node }: { node: EvolutionNode }) {
     <div className="flex items-center my-2.5 justify-center">
       {detail && (
         <span className="flex">
-          <EvolutionRequirement detail={detail} name="name" />
+          <EvolutionRequirement detail={detail} name={name} />
         </span>
       )}
 

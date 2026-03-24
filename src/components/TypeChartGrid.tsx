@@ -1,4 +1,3 @@
-import { useMemo } from "react";
 import { TYPE_CHART } from "../data/type_chart";
 import { ALL_TYPES, PokemonType } from "../types/pokemon";
 import { TypeBadge } from "./TypeBadge";

@@ -3,7 +3,7 @@ import { open } from "@tauri-apps/plugin-shell";
 import { getPokewikiUrl } from "../utils/pokemonUtils";
 
 interface ExternalLinkProps {
-  name: string; // The English name from the API (e.g., "bulbasaur" or "sturdy")
+  name: string;
   type: "ability" | "pokemon";
   text: string;
   className?: string;
