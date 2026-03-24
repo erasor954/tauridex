@@ -2,18 +2,18 @@ import React from "react";
 
 interface ArrowWithLabelProps {
   label: React.ReactNode;
-  width?: number;
+  width?: string;
   className?: string;
 }
 
 export function LabelledArrow({
   label,
-  width = 32,
+  width = "w-32",
   className = "",
 }: ArrowWithLabelProps) {
   return (
     <div
-      className={`relative flex items-center ml-2 mr-2 w-${width} h-10 ${className}`}
+      className={`relative flex items-center ml-2 mr-2 ${width} h-10 ${className}`}
     >
       <div className="w-full h-0.5 bg-slate-600 rounded-full" />
 
