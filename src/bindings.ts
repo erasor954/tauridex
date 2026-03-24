@@ -25,8 +25,10 @@ async getPokemon(id: string) : Promise<Result<PokemonSummary, string>> {
 
 /** user-defined types **/
 
-export type EvolutionDetails = { held_item: NamedAPIResource | null; item: NamedAPIResource | null; min_level: number | null; trigger: NamedAPIResource }
+export type EvolutionDetails = { held_item: Item | null; item: Item | null; min_level: number | null; trigger: NamedAPIResource }
 export type EvolutionNode = { species: NamedAPIResource; evolves_to?: EvolutionNode[]; evolution_details?: EvolutionDetails[] }
+export type Item = { name: string; url: string; sprites?: ItemSprites | null }
+export type ItemSprites = { default: string }
 export type NamedAPIResource = { name: string }
 export type OfficialArtwork = { front_default: string }
 export type OtherSprites = { "official-artwork": OfficialArtwork }

@@ -1,42 +1,31 @@
 import { type EvolutionNode } from "../bindings";
 import { PokemonSprite } from "./PokemonSprite";
+import { EvolutionRequirement } from "./EvolutionRequirement";
 
 export function EvolutionTree({ node }: { node: EvolutionNode }) {
   if (node.evolution_details === undefined || node.evolves_to === undefined) {
     return;
   }
   const detail = node.evolution_details[0];
+  var name = "";
+  if (detail) {
+    name = detail.trigger.name.replace("-", " ");
+  }
 
   return (
-    <div style={{ display: "flex", alignItems: "center", margin: "10px 0" }}>
+    <div className="flex items-center my-2.5 justify-center">
       {detail && (
-        <span style={{ margin: "0 15px", color: "gray" }}>
-          →{" "}
-          {detail.trigger.name === "level-up" && detail.min_level
-            ? `Lvl ${detail.min_level}`
-            : detail.trigger.name}{" "}
-          →
+        <span className="flex">
+          <EvolutionRequirement detail={detail} name="name" />
         </span>
       )}
 
-      <div
-        style={{
-          padding: "10px",
-          border: "1px solid #ccc",
-          borderRadius: "8px",
-        }}
-      >
+      <div className="p-2.5 border rounded-lg border-slate-500">
         <PokemonSprite name={node.species.name} />
       </div>
 
       {node.evolves_to.length > 0 && (
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            marginLeft: "20px",
-          }}
-        >
+        <div className="flex flex-col">
           {node.evolves_to.map((nextNode, index) => (
             <EvolutionTree key={index} node={nextNode} />
           ))}

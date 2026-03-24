@@ -3,7 +3,7 @@ use specta::Type;
 
 #[derive(Serialize, Deserialize, Type, Debug, Clone)]
 pub struct PokemonSummary {
-    pub id: u32,
+    pub id: u16,
     pub name: String,
     pub sprites: Sprites,
     pub abilities: Vec<PokemonAbility>,
@@ -44,7 +44,7 @@ pub struct PokemonTypeSlot {
 
 #[derive(Serialize, Deserialize, Type, Debug, Clone)]
 pub struct PokemonStat {
-    pub base_stat: u32,
+    pub base_stat: u8,
     pub stat: NamedAPIResource,
 }
 
@@ -53,6 +53,11 @@ pub struct NamedAPIResource {
     pub name: String,
 }
 
+// #[derive(Serialize, Deserialize, Type, Debug, Clone)]
+// pub struct NamedAPIResourceWithUrl {
+//     pub name: String,
+//     pub url: String,
+// }
 
 // ----------EVOLUTION----------
 #[derive(Serialize, Deserialize, Type, Debug, Clone)]
@@ -71,19 +76,39 @@ pub struct EvolutionNode {
 
 #[derive(Serialize, Deserialize, Type, Debug, Clone)]
 pub struct EvolutionDetails{
-    pub held_item: Option<NamedAPIResource>,
-    pub item: Option<NamedAPIResource>,
+    pub held_item: Option<Item>,
+    pub item: Option<Item>,
     pub min_level: Option<u32>,
     pub trigger: NamedAPIResource,
 
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Type, Debug, Clone)]
 pub struct SpeciesResponse {
     pub evolution_chain: ApiResourceUrl,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Type, Debug, Clone)]
 pub struct ApiResourceUrl {
     pub url: String,
+}
+
+// -------------ITEM-------------
+#[derive(Serialize, Deserialize, Type, Debug, Clone)]
+pub struct Item {
+    pub name: String,
+    pub url: String,
+
+    #[serde(default)]
+    pub sprites: Option<ItemSprites>,
+}
+
+#[derive(Serialize, Deserialize, Type, Debug, Clone)]
+pub struct ItemSprites {
+    pub default: String,
+}
+
+#[derive(serde::Deserialize)]
+pub struct ItemDetailResponse {
+    pub sprites: ItemSprites,
 }

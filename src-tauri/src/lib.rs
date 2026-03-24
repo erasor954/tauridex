@@ -1,7 +1,33 @@
 mod models;
-use models::{PokemonSummary, SpeciesResponse, EvolutionChainResponse};
+use models::{PokemonSummary, SpeciesResponse, EvolutionChainResponse, EvolutionNode, ItemDetailResponse};
 use std::fs;
 use tauri::{AppHandle, Manager, Wry};
+
+async fn fill_item_details(node: &mut EvolutionNode) {
+    for detail in node.evolution_details.iter_mut() {
+        if let Some(item_struct) = &mut detail.item {
+            if let Ok(res) = reqwest::get(&item_struct.url).await {
+                match res.json::<ItemDetailResponse>().await {
+                    Ok(full_item) => item_struct.sprites = Some(full_item.sprites),
+                    Err(e) => eprintln!("Failed to parse item details: {}", e), // Helps catch future errors!
+                }
+            }
+        }
+        
+        if let Some(held_item_struct) = &mut detail.held_item {
+            if let Ok(res) = reqwest::get(&held_item_struct.url).await {
+                match res.json::<ItemDetailResponse>().await {
+                    Ok(full_item) => held_item_struct.sprites = Some(full_item.sprites),
+                    Err(e) => eprintln!("Failed to parse held_item details: {}", e),
+                }
+            }
+        }
+    }
+
+    for next_node in node.evolves_to.iter_mut() {
+        Box::pin(fill_item_details(next_node)).await;
+    }
+}
 
 #[tauri::command]
 #[specta::specta]
@@ -43,11 +69,12 @@ async fn get_pokemon(app: AppHandle, id: String) -> Result<PokemonSummary, Strin
 
     let evo_url = species_data.evolution_chain.url;
     let evo_res = reqwest::get(&evo_url).await.map_err(|e| e.to_string())?;
-    let evo_data = evo_res
+    let mut evo_data = evo_res
         .json::<EvolutionChainResponse>()
         .await
         .map_err(|e| e.to_string())?;
 
+    fill_item_details(&mut evo_data.chain).await;
     pokemon_data.evolution_chain = Some(evo_data.chain);
 
     let json_string = serde_json::to_string(&pokemon_data).map_err(|e| e.to_string())?;
