@@ -17,7 +17,7 @@ export function TypeBadge({ type, scale = 2 }: TypeBadgeProps) {
         width: "auto",
         imageRendering: "pixelated",
       }}
-      className="inline-block object-contain"
+      className="inline-block object-contain max-w-none"
       onError={(e) => (e.currentTarget.style.display = "none")}
     />
   );

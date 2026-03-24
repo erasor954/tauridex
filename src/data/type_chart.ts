@@ -94,3 +94,24 @@ export const TYPE_CHART: Partial<
 };
 
 export const ALL_TYPES = Object.keys(TYPE_CHART);
+
+export const ATTACKING_CHART = Object.entries(TYPE_CHART).reduce(
+  (acc, [defender, attackers]) => {
+    const defType = defender as PokemonType;
+
+    if (!attackers) return acc;
+
+    Object.entries(attackers).forEach(([attacker, multiplier]) => {
+      const atkType = attacker as PokemonType;
+
+      if (!acc[atkType]) {
+        acc[atkType] = {};
+      }
+
+      acc[atkType]![defType] = multiplier;
+    });
+
+    return acc;
+  },
+  {} as Partial<Record<PokemonType, Partial<Record<PokemonType, number>>>>,
+);

@@ -10,11 +10,9 @@ export function getDefenseProfile(
   return (ALL_TYPES as PokemonType[]).map((attacker: PokemonType) => {
     let multiplier = defendingTypes.reduce(
       (acc: number, defender: PokemonType) => {
-        // THE FIX: We look up the Defender's row in your chart
         const defenderRow = TYPE_CHART[defender];
         if (!defenderRow) return acc;
 
-        // Then we check how much damage the Attacker does to that Defender
         const effectiveness = defenderRow[attacker] ?? 1;
         return acc * effectiveness;
       },
@@ -34,8 +32,6 @@ export function getDefenseProfile(
     return { type: attacker, multiplier };
   });
 }
-
-// --- The Missing Component --- //
 
 interface TypeViewProps {
   types: PokemonType[];

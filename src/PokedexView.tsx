@@ -4,14 +4,14 @@ import { commands, type PokemonSummary } from "./bindings";
 import { PokemonType } from "./types/pokemon";
 import { StatView } from "./components/StatView";
 import { TypeView } from "./components/TypeView";
-import { ChevronLeft, ChevronRight, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import { AbilityView } from "./components/AbilityView";
 import { ExternalLink } from "./components/ExternalLink";
 import { PokemonImage } from "./components/PokemonImage";
 import { EvolutionTree } from "./components/EvolutionTree";
 import { nameToIdIndex } from "./utils/pokemonUtils";
-
-const HIGHEST_POKEDEX_ID: number = 1025 as const;
+import { PopoutButton } from "./components/PopoutButton";
+import NavigationButton from "./components/NavigationButton";
 
 const allPokemonNames = Object.keys(nameToIdIndex);
 
@@ -84,8 +84,10 @@ export function PokedexView() {
       const result = await commands.getPokemon(resolvedId.toString());
 
       if (result.status === "ok") {
-        setPokemonData(result.data); // result.data is now guaranteed to be PokemonSummary
-        setSearchInput(manualInput || searchInput);
+        setPokemonData(result.data);
+        if (manualInput && e !== undefined) {
+          setSearchInput(manualInput);
+        }
       } else {
         console.error("Search error:", result.error);
         setError("Pokémon not found. Try another name or ID.");
@@ -104,23 +106,16 @@ export function PokedexView() {
 
   return (
     <div className="min-h-screen bg-slate-900 text-white p-8">
-      <div className="max-w-lg mx-auto mb-8 relative">
-        <form onSubmit={handleSearch} className="w-full mx-auto mb-8">
-          <div className="flex gap-3 items-stretch justify-center">
-            <div className="flex-none aspect-square">
-              {pokemonData && pokemonData.id > 1 && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    handleSearch(undefined, (pokemonData.id - 1).toString());
-                  }}
-                  className="p-3 rounded-lg bg-slate-800 border border-slate-700 hover:bg-slate-700 text-cyan-400 transition-colors"
-                >
-                  <ChevronLeft size={24} />
-                </button>
-              )}
-            </div>
-            <div className="flex-1 flex gap-2 min-w-0">
+      <div className="max-w-xl mx-auto mb-8 relative flex">
+        <form onSubmit={handleSearch} className="w-full mx-auto mb-2">
+          <div className="flex items-stretch justify-center gap-3 max-w-full mx-auto">
+            <PopoutButton />
+            <NavigationButton
+              direction="left"
+              currentId={pokemonData?.id}
+              onNavigate={(id) => handleSearch(undefined, id)}
+            />
+            <div className="flex flex-none min-w-75 md:w-112.5 group focus-within:ring-1 focus-within:ring-cyan-400 rounded-lg transition-all">
               <input
                 id="doesntmatter"
                 type="text"
@@ -132,28 +127,24 @@ export function PokedexView() {
                   if (suggestions.length > 0) setShowSuggestions(true);
                 }}
                 placeholder="Search by name or ID"
-                className="w-full p-3 rounded-lg bg-slate-800 border border-slate-700 focus:border-cyan-400 focus:outline-none transition-colors"
+                className="flex-1 px-4 rounded-l-lg w-full p-3 bg-slate-800 border border-slate-700 border-r-0 focus:border-cyan-400 focus:outline-none transition-colors"
               />
               <button
                 type="submit"
-                className="px-6 py-3 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-bold transition-colors"
+                className="flex-none px-5 rounded-r-lg bg-slate-800 border border-slate-700 border-l-0 hover:bg-slate-700 text-cyan-400 group-focus-within:border-cyan-400 transition-colors flex items-center justify-center group"
               >
                 <Search size={24} />
               </button>
             </div>
-            <div className="flex-none aspect-square">
-              {pokemonData && pokemonData.id < HIGHEST_POKEDEX_ID && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    handleSearch(undefined, (pokemonData.id + 1).toString());
-                  }}
-                  className="p-3 rounded-lg bg-slate-800 border border-slate-700 hover:bg-slate-700 text-cyan-400 transition-colors"
-                >
-                  <ChevronRight size={24} />
-                </button>
-              )}
-            </div>
+            <NavigationButton
+              direction="right"
+              currentId={pokemonData?.id}
+              onNavigate={(id) => handleSearch(undefined, id)}
+            />
+            <div
+              className="flex-none aspect-square p-3 w-12 invisible"
+              aria-hidden="true"
+            />
           </div>
         </form>
         {showSuggestions && suggestions.length > 0 && (
