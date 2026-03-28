@@ -13,4 +13,4 @@ Another key feature is the ability to type the names of the Pokémon in both Eng
 - [x] showing abilities
 - [ ] wonderguard implementation
 - [ ] evolutions (needs polishing)
--
+- [ ] Mega-evolution toggle
